@@ -10,13 +10,19 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 
 public class Getter {
-    public static ArrayList getter(){
+
+    public static ArrayList getter(String key,String station){
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api.rasp.yandex.net/v3.0/schedule/?apikey=b6bc2c85-21ce-4c6a-884a-52eb303dd916&station=s9603770&transport_types=suburban")).build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(URLBuilder(key,station))).build();
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(Getter::parse)
                 .join();
+    }
+
+    private static String URLBuilder(String key, String station){
+        String url = "https://api.rasp.yandex.net/v3.0/schedule/?apikey="+""+key+""+"&station="+""+station+""+"&transport_types=suburban";
+        return url;
     }
 
     private static ArrayList parse(String responseBody){
