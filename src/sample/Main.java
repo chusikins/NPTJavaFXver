@@ -4,22 +4,20 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Application {
 
     Stage window;
     Scene mainpage, rapspage;
-    ListView mListView = new ListView();
+    static String key = "b6bc2c85-21ce-4c6a-884a-52eb303dd916";
 
     public static void main(String[] args) {
         launch(args);
@@ -28,24 +26,24 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
+        ListView mListView = new ListView();
+        HashMap<String,String> sthash = Stations.stationsconv();
+        String[] stations = Stations.stationlist;
 
         window = primaryStage;
         primaryStage.setTitle("Rasp Thingy");
         window.setOnCloseRequest(e -> closeProgram());
 
-
-        TextField keyinput = new TextField();
-        TextField stationinput = new TextField();
-
-
+        ChoiceBox<String> stationinput = new ChoiceBox<>();
+        stationinput.getItems().addAll(stations);
 
 
         Button torasppage = new Button("Get times");
         torasppage.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                String key = keyinput.getText();
-                String station = stationinput.getText();
+                //String key = keyinput.getText();
+                String station = sthash.get(stationinput.getValue());
                 ArrayList info1 = trninfconverter(key,station);
                 for (int i = 0; i < info1.size(); i++){
                     mListView.getItems().add(info1.get(i));
@@ -58,11 +56,14 @@ public class Main extends Application {
         quit.setOnAction(e -> closeProgram());
 
         VBox mainpagelay = new VBox(20);
-        mainpagelay.getChildren().addAll(keyinput,stationinput,torasppage,quit);
+        mainpagelay.getChildren().addAll(stationinput,torasppage,quit);
         mainpage = new Scene(mainpagelay, 300, 250);
 
         Button tomain = new Button("Get back");
-        tomain.setOnAction(e -> window.setScene(mainpage));
+        tomain.setOnAction(e -> {
+            mListView.getItems().clear();
+            window.setScene(mainpage);
+        });
 
         Label rasppagetext = new Label("Schedule");
         VBox rasppagelay = new VBox(20);
@@ -87,7 +88,7 @@ public class Main extends Application {
     }
 
     private void closeProgram(){
-        Boolean answer = AlertBox.display("Title", "Are you sure you want to exit?");
+        boolean answer = AlertBox.display("Title", "Are you sure you want to exit?");
         if(answer){
             window.close();
         }

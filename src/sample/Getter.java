@@ -21,24 +21,30 @@ public class Getter {
     }
 
     private static String URLBuilder(String key, String station){
-        String url = "https://api.rasp.yandex.net/v3.0/schedule/?apikey="+""+key+""+"&station="+""+station+""+"&transport_types=suburban";
+        String url = "https://api.rasp.yandex.net/v3.0/schedule/?apikey="+key+"&station="+station+"&transport_types=suburban";
         return url;
     }
 
     private static ArrayList parse(String responseBody){
-        ArrayList<String> traininfo = new ArrayList<String>();
+        ArrayList<String> traininfo = new ArrayList<>();
         JSONObject mainobj = new JSONObject(responseBody);
         JSONObject pagination = mainobj.getJSONObject("pagination");
         JSONArray schedule = mainobj.getJSONArray("schedule");
         System.out.println(pagination);
+
         for (int i = 0; i < schedule.length(); i++ ){
-            JSONObject train = (schedule).getJSONObject(i);
-            String arrival = train.getString("arrival");
-            String  direction = train.getString("direction");
-            JSONObject thread = train.getJSONObject("thread");
-            String title = thread.getString("title");
-            String templine = title + "/" + arrival + "/" + direction;
-            traininfo.add(templine);
+            try {
+                JSONObject train = schedule.getJSONObject(i);
+                String  direction = train.getString("direction");
+                JSONObject thread = train.getJSONObject("thread");
+                String arrival = schedule.getJSONObject(i).getString("arrival");
+                String title = thread.getString("title");
+                String templine = title + "/" + arrival + "/" + direction;
+                traininfo.add(templine);
+            } catch (Exception e){
+                String templine = "Поезд/дал/null";
+                traininfo.add(templine);
+            }
         }
         return traininfo;
     }
